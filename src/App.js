@@ -13,25 +13,25 @@ import FileList from './components/FileList'
 class App extends Component {
   state = {
     uploadedFiles: [], //Armazena as informações dos arquivos que o usuário fez upload
-  }
+  };
   
-  async componenteDidMount() {
-    const response = await api.get('posts');
+  async componentDidMount() { //Para recarregar toda a lista de posts da minha api
+    const response = await api.get("posts");
 
-    this.setState({
+    this.setState({ //As informações que exibo são diferentes da que tenho na api
       uploadedFiles: response.data.map(file => ({
-        id: file.id,
+        id: file._id,
         name: file.name,
         readableSize: filesize(file.size),
         preview: file.url,
         uploaded: true,
         url: file.url
       }))
-    })
+    });
   }
 
-  handleUpload = files => {
-    const uploadedFiles = files.map(file => ({
+  handleUpload = files => { //Preencho o estado do uploadFile independente se deu erro ou não
+    const uploadedFiles = files.map(file => ({ // Recebo cada file e produzo um objeto
       file, 
       id: uniqueId(),
       name: file.name,
@@ -50,26 +50,28 @@ class App extends Component {
     uploadedFiles.forEach(this.processUpload);
   };
 
-  updateFile = (id, data) => {
-    this.setState({ 
+  updateFile = (id, data) => { //Atualizo o arquivo, o progresso dele
+    this.setState({
       uploadedFiles: this.state.uploadedFiles.map(uploadedFile => {
-        return id === uploadedFile.id ? { ...uploadedFile, ...data } : uploadedFile;
-      }) 
+        return id === uploadedFile.id
+          ? { ...uploadedFile, ...data }
+          : uploadedFile;
+      })
     });
   };
 
-  processUpload = (uploadedFile) => {
+  processUpload = (uploadedFile) => { //Envio os arquivos para o back-end e pego posso medir o progresso
     const data = new FormData(); //Objeto que o html transforma nosso campos do formulário dentro do JS
     
     data.append('file', uploadedFile.file, uploadedFile.name);
 
-    api.post('/posts', data, {
+    api.post('posts', data, {
       onUploadProgress: e => {
         const progress = parseInt(Math.round((e.loaded * 100) / e.total));
 
         this.updateFile(uploadedFile.id, {
           progress
-        })
+        });
       }
     }).then(response => {
       this.updateFile(uploadedFile.id, {
@@ -84,7 +86,7 @@ class App extends Component {
     });
   }
 
-  handleDelete = async id => {
+  handleDelete = async id => { // Deleta e atualiza a lista de arquivos 
     await api.delete(`posts/${id}`);
 
     this.setState({
@@ -92,7 +94,7 @@ class App extends Component {
     });
   }
 
-  componentWillUnmount() {
+  componentWillUnmount() { //Fechar a aplicação exclui as imagens em cash
     //Deleta todos os objectsUrl que a gente criou anteriormente para não sobra mais nenhum cash de imagem
     this.state.uploadedFiles.forEach(file => URL.revokeObjectURL(file.preview));
   }

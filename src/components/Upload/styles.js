@@ -16,10 +16,14 @@ export const DropContainer = styled.div.attrs({
     cursor: pointer;
 
     transition: height 0.2s ease;
-
+    
     ${props => props.isDragActive && dragActive};
     ${props => props.isDragReject && dragReject};
 `;
+
+/* Mesma coisa que se então 
+    ${props => props.isDragActive && dragActive};
+*/
 
 const messageColors = {
     default: "#999",

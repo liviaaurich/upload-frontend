@@ -4,8 +4,6 @@ import Dropzone from 'react-dropzone';
 
 import { DropContainer, UploadMessage } from './styles';
 
-// import { Container } from './styles';
-
 export default class Upload extends Component {
   
   renderDragMessage = (isDragActive, isDragReject) => {
@@ -22,19 +20,19 @@ export default class Upload extends Component {
 
   render() {
     const { onUpload } = this.props;
-    
     return (
       <Dropzone accept="image/*" onDropAccepted={onUpload}>
-        { ({ getRootProps, getInputProps, isDragActive, isDragReject }) => (
+        {({ getRootProps, getInputProps, isDragActive, isDragReject }) => (
           <DropContainer 
             {...getRootProps()}
             isDragActive={isDragActive} //Simboliza quando o usuário está com o mouse passando por cima dessa zone
             isDragReject={isDragReject} //Quando o usuario esta passando um arquivo que nao é imagem
           >
             <input {...getInputProps()} />
+            {console.log(isDragReject)}
             {this.renderDragMessage(isDragActive, isDragReject)}
           </DropContainer>
-        ) }
+        )}
       </Dropzone>  
     );
   }
